@@ -1,0 +1,79 @@
+CREATE TABLE Subject
+(
+    sub_id integer primary key,
+    sub_name varchar(30) NOT NULL
+);
+
+create table Student(
+	sid integer primary key,
+	sfname varchar(30),
+	slname varchar(30),
+	smname varchar(30),
+	semail varchar(50) unique,
+	spassword varchar(100),
+	sphone BIGINT unique, 
+	sdob date,
+	sgender varchar(20),
+	screated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	supdated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+	
+create table Faculty(
+	fid integer primary key,
+	ffname varchar(30),
+	flname varchar(30),
+	femail varchar(50) unique,
+	fpassword varchar(100),
+	sub_id integer references Subject(sub_id),
+	fphone BIGINT unique, 
+	fdob date,
+	fgender varchar(20),
+	fcreated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	fupdated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+	
+	
+create table Admin(
+	aid integer primary key,
+	afname varchar(30),
+	alname varchar(30),
+	aemail varchar(50) unique,
+	apassword varchar(100),
+	aphone BIGINT unique, 
+	adob date,
+	agender varchar(20),
+	acreated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	aupdated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+create table SubjectFile(
+	file_id SERIAL primary key,
+	file_name varchar(30),
+	file_type varchar(30),
+	file_desc varchar(50),
+	fid integer references Faculty(fid),
+	sub_id integer references Subject(sub_id),
+	file_created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	file_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+======================================================================================================================================================
+
+##################### Inner join query for file table ##################### 
+
+-> select filename,filedesc,filetype,sub_name,ffname from SubjectFile file 
+inner join faculty fac on file.fid = fac.fid
+inner join subject sub on sub.sub_id = fac.sub_id;
+
+======================================================================================================================================================
+
+// Trigger
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+	
+	
